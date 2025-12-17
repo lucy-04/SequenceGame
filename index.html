@@ -929,12 +929,12 @@
         
         <div class="instruction-item">
             <span class="icon">🔄</span>
-            <p><strong>Play:</strong> Click two circles to swap their positions</p>
+            <p><strong>Play:</strong> Click two circles to swap their positions<br> Click Check Allignment to check if the circle is in the correct position position</p>
         </div>
         
         <div class="instruction-item">
             <span class="icon">✨</span>
-            <p><strong>Win:</strong> All circles glow green when they match</p>
+            <p><strong>Win:</strong> Allign all the circles in the correct order</p>
         </div>
         
         <div class="instruction-item">
@@ -1126,6 +1126,16 @@
 
             switchScreen('gameScreen');
             renderCircles();
+            
+            // Update label based on game mode
+            if (gameState.mode === 'moves') {
+                document.getElementById('timerLabel').textContent = 'Moves Left';
+                document.getElementById('timerValue').textContent = gameState.movesLeft;
+            } else {
+                document.getElementById('timerLabel').textContent = 'Time Left';
+                document.getElementById('timerValue').textContent = gameState.timeLeft + 's';
+            }
+            
             startTimer();
             updateStats();
         }
@@ -1231,6 +1241,7 @@
                 gameState.timerInterval = setInterval(() => {
                     gameState.timeLeft--;
                     document.getElementById('timerValue').textContent = gameState.timeLeft + 's';
+                    document.getElementById('timerLabel').textContent = 'Time Left';
 
                     if (gameState.timeLeft <= 0) {
                         endGame(false);

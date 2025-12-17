@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circle Sequence - Match the Hidden Pattern</title>
+    <meta name="description" content="Circle Sequence Game: A puzzle game where you match circles to a hidden pattern. Play time-based or move-based challenges with achievements and leaderboards.">
+    <meta name="theme-color" content="#0a0e27">
+    <meta name="keywords" content="puzzle game, pattern matching, memory game, circle game, free online games">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://yourdomain.com/">
+    <meta property="og:title" content="Circle Sequence - Pattern Matching Puzzle Game">
+    <meta property="og:description" content="Test your memory! Match colored circles to a hidden pattern. Unlock achievements, build streaks, and climb the leaderboard!">
+    
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR_GA_ID"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-YOUR_GA_ID');
+      function trackGameEvent(action, label, value) {
+        gtag('event', action, {
+          'event_category': 'game',
+          'event_label': label,
+          'value': value
+        });
+      }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Poppins:wght@300;400;600;700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --color-bg-dark: #0a0e27;
+            --color-bg-darker: #050710;
+            --color-primary: #00d4ff;
+            --color-secondary: #a000ff;
+            --color-accent: #ff00ff;
+            --color-success: #00ff88;
+            --color-warning: #ffb000;
+            --color-error: #ff0055;
+            --color-text: #ffffff;
+            --color-text-secondary: #b0b8cc;
+            --gradient-primary: linear-gradient(135deg, #00d4ff 0%, #a000ff 100%);
+            --gradient-secondary: linear-gradient(135deg, #a000ff 0%, #ff00ff 100%);
+            --glow-primary: 0 0 20px rgba(0, 212, 255, 0.5);
+            --glow-secondary: 0 0 20px rgba(160, 0, 255, 0.5);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--color-bg-dark);
+            color: var(--color-text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: auto;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 80%, rgba(160, 0, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 42px;
+            font-weight: 900;
+            margin-bottom: 10px;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(0, 212, 255, 0.3);
+            letter-spacing: 2px;
+        }
+
+        .header p {
+            color: var(--color-text-secondary);
+            font-size: 15px;
+            font-weight: 300;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .top-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 25px;
+            animation: fadeInUp 0.8s ease-out 0.1s both;
+        }
+
+        .stat-badge {
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            padding: 12px 8px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .stat-badge:hover {
+            background: rgba(0, 212, 255, 0.15);
+            border-color: var(--color-primary);
+            box-shadow: var(--glow-primary);
+            transform: translateY(-2px);
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .screen {
+            display: none;
+            animation: fadeIn 0.4s ease-in;
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes neonGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(0, 212, 255, 0.5); }
+            50% { text-shadow: 0 0 20px rgba(0, 212, 255, 0.8); }
+        }
+
+        /* Menu Screen */
+        .menu-screen {
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 45px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 0 30px rgba(0, 212, 255, 0.1);
+        }
+
+        .menu-screen h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            margin-bottom: 30px;
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mode-selector {
+            display: grid;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .mode-btn {
+            padding: 16px 20px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            background: rgba(0, 212, 255, 0.05);
+            color: var(--color-text);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+        }
+
+        .mode-btn:hover {
+            border-color: var(--color-primary);
+            background: rgba(0, 212, 255, 0.15);
+            box-shadow: var(--glow-primary);
+            transform: translateY(-3px);
+        }
+
+        .mode-btn.selected {
+            border-color: var(--color-primary);
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(160, 0, 255, 0.2) 100%);
+            box-shadow: var(--glow-primary), inset 0 0 10px rgba(0, 212, 255, 0.2);
+            color: var(--color-primary);
+        }
+
+        .difficulty-selector {
+            margin-bottom: 30px;
+        }
+
+        .difficulty-selector label {
+            display: block;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .difficulty-buttons {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .diff-btn {
+            padding: 14px;
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(0, 212, 255, 0.05);
+            color: var(--color-text);
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .diff-btn:hover {
+            border-color: var(--color-primary);
+            background: rgba(0, 212, 255, 0.15);
+            box-shadow: var(--glow-primary);
+            transform: scale(1.05);
+        }
+
+        .diff-btn.selected {
+            border-color: var(--color-accent);
+            background: linear-gradient(135deg, rgba(255, 0, 255, 0.3) 0%, rgba(160, 0, 255, 0.3) 100%);
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.5);
+        }
+
+        .play-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--gradient-primary);
+            color: var(--color-bg-dark);
+            border: 2px solid var(--color-primary);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            box-shadow: var(--glow-primary);
+        }
+
+        .play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
+        }
+
+        .play-btn:active {
+            transform: translateY(-1px);
+        }
+
+        /* Game Screen */
+        .game-screen {
+            background: rgba(10, 14, 39, 0.8);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .game-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            text-align: center;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .game-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .info-box {
+            background: rgba(0, 212, 255, 0.08);
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .info-box:hover {
+            background: rgba(0, 212, 255, 0.12);
+            border-color: var(--color-primary);
+            box-shadow: var(--glow-primary);
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .progress-section {
+            margin-bottom: 20px;
+        }
+
+        .progress-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 212, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-primary);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 212, 255, 0.6);
+        }
+
+        .combo-display {
+            text-align: center;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 14px;
+            color: var(--color-warning);
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .game-board {
+            margin-bottom: 25px;
+        }
+
+        .board-label {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .circles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(70px, 1fr));
+            gap: 12px;
+            margin-bottom: 20px;
+            perspective: 1000px;
+        }
+
+        .circle {
+            width: 100%;
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 3px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            transform-style: preserve-3d;
+            user-select: none;
+        }
+
+        .circle:hover {
+            transform: scale(1.12) translateZ(20px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+        }
+
+        .circle.selected {
+            border-color: var(--color-warning);
+            box-shadow: 0 0 25px rgba(255, 176, 0, 0.8), inset 0 0 15px rgba(255, 176, 0, 0.3);
+            animation: pulse 0.4s ease-out;
+        }
+
+        .circle.correct {
+            animation: correctPulse 0.5s ease-out;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 176, 0, 0.8); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 176, 0, 0); }
+            100% { box-shadow: 0 0 25px rgba(255, 176, 0, 0.8), inset 0 0 15px rgba(255, 176, 0, 0.3); }
+        }
+
+        @keyframes correctPulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .color-red { background: linear-gradient(135deg, #ff1744 0%, #d81b60 100%); }
+        .color-blue { background: linear-gradient(135deg, #2196f3 0%, #1565c0 100%); }
+        .color-green { background: linear-gradient(135deg, #00ff88 0%, #00c853 100%); }
+        .color-yellow { background: linear-gradient(135deg, #ffb000 0%, #ff6d00 100%); }
+        .color-purple { background: linear-gradient(135deg, #a000ff 0%, #6200ea 100%); }
+        .color-pink { background: linear-gradient(135deg, #ff00ff 0%, #c2185b 100%); }
+        .color-cyan { background: linear-gradient(135deg, #00d4ff 0%, #0097a7 100%); }
+        .color-orange { background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%); }
+
+        .game-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 12px;
+            border: 2px solid transparent;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            grid-column: span 2;
+            background: var(--gradient-primary);
+            color: var(--color-bg-dark);
+            border-color: var(--color-primary);
+            box-shadow: var(--glow-primary);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
+        }
+
+        .btn-secondary {
+            background: rgba(0, 212, 255, 0.1);
+            color: var(--color-primary);
+            border-color: rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(0, 212, 255, 0.2);
+            border-color: var(--color-primary);
+            box-shadow: var(--glow-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Result Screen */
+        .result-screen {
+            background: rgba(10, 14, 39, 0.95);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            border-radius: 20px;
+            padding: 45px;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .result-icon {
+            font-size: 100px;
+            margin-bottom: 20px;
+            animation: bounce 0.8s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .result-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 42px;
+            margin-bottom: 10px;
+            font-weight: 900;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .result-subtitle {
+            color: var(--color-text-secondary);
+            font-size: 16px;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .achievement-unlock {
+            background: rgba(255, 176, 0, 0.15);
+            border: 2px solid var(--color-warning);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            animation: slideInDown 0.6s ease-out;
+        }
+
+        @keyframes slideInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .achievement-text {
+            font-size: 14px;
+            color: var(--color-warning);
+            font-weight: 600;
+        }
+
+        .result-stats {
+            background: rgba(0, 212, 255, 0.08);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: var(--color-text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 18px;
+            background: var(--gradient-secondary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes celebrateFall {
+            to {
+                transform: translateY(100vh) rotateZ(360deg);
+                opacity: 0;
+            }
+        }
+
+        .confetti.active {
+            animation: celebrateFall 3s ease-in forwards;
+        }
+
+        .leaderboard {
+            background: rgba(0, 212, 255, 0.08);
+            border: 1px solid rgba(0, 212, 255, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .leaderboard-title {
+            font-size: 12px;
+            color: var(--color-text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+            font-size: 13px;
+        }
+
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+
+        .leaderboard-rank {
+            color: var(--color-primary);
+            font-weight: 700;
+            min-width: 30px;
+        }
+
+        .leaderboard-rank.gold { color: var(--color-warning); }
+        .leaderboard-rank.silver { color: #c0c0c0; }
+        .leaderboard-rank.bronze { color: #cd7f32; }
+
+        .leaderboard-score {
+            color: var(--color-success);
+            font-weight: 600;
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 32px;
+            }
+
+            .menu-screen, .game-screen, .result-screen {
+                padding: 24px;
+            }
+
+            .difficulty-buttons {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .circles-grid {
+                gap: 8px;
+            }
+
+            .top-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .result-title {
+                font-size: 32px;
+            }
+        }
+
+        /* Scrollbar styling */
+        .leaderboard::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .leaderboard::-webkit-scrollbar-track {
+            background: rgba(0, 212, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .leaderboard::-webkit-scrollbar-thumb {
+            background: rgba(0, 212, 255, 0.4);
+            border-radius: 10px;
+        }
+
+        .leaderboard::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 212, 255, 0.6);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⚡ CIRCLE SEQUENCE</h1>
+            <p>Match the Hidden Pattern</p>
+        </div>
+
+        <div class="top-stats">
+            <div class="stat-badge">
+                <div class="stat-label">🔥 Streak</div>
+                <div class="stat-value" id="streakValue">0</div>
+            </div>
+            <div class="stat-badge">
+                <div class="stat-label">⭐ Level</div>
+                <div class="stat-value" id="levelValue">1</div>
+            </div>
+            <div class="stat-badge">
+                <div class="stat-label">🏆 Score</div>
+                <div class="stat-value" id="totalScoreValue">0</div>
+            </div>
+        </div>
+
+        <!-- Menu Screen -->
+        <div class="screen menu-screen active" id="menuScreen">
+            <h2>Select Game Mode</h2>
+            <div class="mode-selector">
+                <button class="mode-btn selected" data-mode="time">⏱️ TIME CHALLENGE</button>
+                <button class="mode-btn" data-mode="moves">🎯 MOVE CHALLENGE</button>
+            </div>
+
+            <div class="difficulty-selector">
+                <label>Select Difficulty Level</label>
+                <div class="difficulty-buttons">
+                    <button class="diff-btn selected" data-difficulty="4">Easy (4)</button>
+                    <button class="diff-btn" data-difficulty="6">Medium (6)</button>
+                    <button class="diff-btn" data-difficulty="8">Hard (8)</button>
+                </div>
+            </div>
+
+            <button class="play-btn" id="playBtn">Start Game</button>
+            
+            <div class="leaderboard">
+                <div class="leaderboard-title">🏅 TOP SCORES</div>
+                <div id="leaderboardList"></div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="screen game-screen" id="gameScreen">
+            <div class="game-title" id="gameTitle">Match the Pattern</div>
+            
+            <div class="game-info">
+                <div class="info-box">
+                    <div class="info-label" id="timerLabel">Time Left</div>
+                    <div class="info-value" id="timerValue">60s</div>
+                </div>
+                <div class="info-box">
+                    <div class="info-label">✨ Matches</div>
+                    <div class="info-value" id="statsValue">0</div>
+                </div>
+            </div>
+
+            <div class="progress-section">
+                <div class="progress-label">
+                    <span>Progress to Victory</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="combo-display" id="comboDisplay"></div>
+
+            <div class="game-board">
+                <div class="board-label">👇 ARRANGE THE CIRCLES</div>
+                <div class="circles-grid" id="circlesGrid"></div>
+            </div>
+
+            <div class="game-actions">
+                <button class="btn btn-primary" id="checkBtn">Check Alignment</button>
+                <button class="btn btn-secondary" id="resetBtn">Reset</button>
+                <button class="btn btn-secondary" id="backBtn">Back</button>
+            </div>
+        </div>
+
+        <!-- Result Screen -->
+        <div class="screen result-screen" id="resultScreen">
+            <div class="result-icon" id="resultIcon">🎉</div>
+            <h2 class="result-title" id="resultTitle">You Won!</h2>
+            <p class="result-subtitle" id="resultSubtitle">Congratulations!</p>
+            
+            <div id="achievementAlert"></div>
+
+            <div class="result-stats" id="resultStats"></div>
+            
+            <div class="leaderboard" id="resultLeaderboard">
+                <div class="leaderboard-title">🏅 LEADERBOARD</div>
+                <div id="resultLeaderboardList"></div>
+            </div>
+
+            <button class="play-btn" id="playAgainBtn">Play Again</button>
+        </div>
+    </div>
+
+    <script>
+        const COLORS = ['red', 'blue', 'green', 'yellow', 'purple', 'pink', 'cyan', 'orange'];
+        
+        let gameState = {
+            mode: 'time',
+            difficulty: 4,
+            circles: [],
+            target: [],
+            selectedCircles: [null, null],
+            timeLeft: 60,
+            totalMoves: 0,
+            movesLeft: 0,
+            gameActive: false,
+            timerInterval: null,
+            currentScore: 0,
+            totalScore: parseInt(localStorage.getItem('totalScore')) || 0,
+            streak: parseInt(localStorage.getItem('streak')) || 0,
+            level: parseInt(localStorage.getItem('level')) || 1,
+            comboMultiplier: 1,
+            consecutiveMatches: 0,
+            gameStartTime: 0
+        };
+
+        const ACHIEVEMENTS = {
+            firstWin: { id: 'firstWin', name: 'First Victory', desc: 'Win your first game', unlocked: false },
+            tenStreak: { id: 'tenStreak', name: '🔥 On Fire!', desc: '10 consecutive wins', unlocked: false },
+            perfectGame: { id: 'perfectGame', name: '💯 Perfect Game', desc: 'Win without mistakes', unlocked: false },
+            speedDemon: { id: 'speedDemon', name: '⚡ Speed Demon', desc: 'Win in under 10 seconds', unlocked: false },
+            hardMaster: { id: 'hardMaster', name: '🎯 Hard Master', desc: 'Win on hard difficulty', unlocked: false }
+        };
+
+        // Initialize event listeners
+        document.querySelectorAll('.mode-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                gameState.mode = btn.dataset.mode;
+            });
+        });
+
+        document.querySelectorAll('.diff-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+                gameState.difficulty = parseInt(btn.dataset.difficulty);
+            });
+        });
+
+        document.getElementById('playBtn').addEventListener('click', () => {
+            trackGameEvent('game_start', gameState.mode + '_' + gameState.difficulty);
+            startGame();
+        });
+        document.getElementById('checkBtn').addEventListener('click', checkAlignment);
+        document.getElementById('resetBtn').addEventListener('click', resetGame);
+        document.getElementById('backBtn').addEventListener('click', backToMenu);
+        document.getElementById('playAgainBtn').addEventListener('click', backToMenu);
+
+        function updateStats() {
+            document.getElementById('streakValue').textContent = gameState.streak;
+            document.getElementById('levelValue').textContent = gameState.level;
+            document.getElementById('totalScoreValue').textContent = gameState.totalScore;
+        }
+
+        function updateLeaderboard() {
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            const menuLeaderboard = document.getElementById('leaderboardList');
+            
+            menuLeaderboard.innerHTML = leaderboard.slice(0, 5).map((entry, i) => `
+                <div class="leaderboard-entry">
+                    <span class="leaderboard-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">
+                        #${i + 1}
+                    </span>
+                    <span class="leaderboard-score">${entry.score}</span>
+                </div>
+            `).join('');
+        }
+
+        function startGame() {
+            gameState.circles = shuffleArray(generateColorArray(gameState.difficulty));
+            gameState.target = generateColorArray(gameState.difficulty);
+            gameState.timeLeft = 60;
+            gameState.totalMoves = 0;
+            gameState.movesLeft = gameState.mode === 'moves' ? 30 : Infinity;
+            gameState.gameActive = true;
+            gameState.selectedCircles = [null, null];
+            gameState.currentScore = 0;
+            gameState.comboMultiplier = 1;
+            gameState.consecutiveMatches = 0;
+            gameState.gameStartTime = Date.now();
+
+            switchScreen('gameScreen');
+            renderCircles();
+            startTimer();
+            updateStats();
+        }
+
+        function generateColorArray(size) {
+            let colors = [];
+            for (let i = 0; i < size; i++) {
+                colors.push(COLORS[i % COLORS.length]);
+            }
+            return colors;
+        }
+
+        function shuffleArray(array) {
+            return array.sort(() => Math.random() - 0.5);
+        }
+
+        function renderCircles() {
+            const grid = document.getElementById('circlesGrid');
+            grid.innerHTML = '';
+
+            gameState.circles.forEach((color, index) => {
+                const circle = document.createElement('div');
+                circle.className = `circle color-${color}`;
+                circle.dataset.index = index;
+
+                if (color === gameState.target[index]) {
+                    circle.classList.add('correct');
+                }
+
+                circle.addEventListener('click', () => selectCircle(index, circle));
+                grid.appendChild(circle);
+            });
+        }
+
+        function selectCircle(index, element) {
+            if (!gameState.gameActive) return;
+
+            if (gameState.selectedCircles[0] === null) {
+                gameState.selectedCircles[0] = index;
+                element.classList.add('selected');
+            } else if (gameState.selectedCircles[1] === null) {
+                if (index !== gameState.selectedCircles[0]) {
+                    gameState.selectedCircles[1] = index;
+                    element.classList.add('selected');
+                    swapCircles();
+                }
+            }
+        }
+
+        function swapCircles() {
+            const [i, j] = gameState.selectedCircles;
+            [gameState.circles[i], gameState.circles[j]] = [gameState.circles[j], gameState.circles[i]];
+            gameState.totalMoves++;
+            gameState.movesLeft = gameState.mode === 'moves' ? 30 - gameState.totalMoves : Infinity;
+
+            gameState.selectedCircles = [null, null];
+            renderCircles();
+
+            if (gameState.mode === 'moves' && gameState.movesLeft <= 0) {
+                endGame(false);
+            }
+        }
+
+        function checkAlignment() {
+            const matches = gameState.circles.reduce((count, color, i) => {
+                return count + (color === gameState.target[i] ? 1 : 0);
+            }, 0);
+
+            document.getElementById('statsValue').textContent = matches;
+            
+            const progress = (matches / gameState.difficulty) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressPercent').textContent = Math.round(progress) + '%';
+
+            // Update combo
+            if (matches === gameState.difficulty) {
+                gameState.consecutiveMatches++;
+                gameState.comboMultiplier = Math.min(1 + (gameState.consecutiveMatches * 0.5), 5);
+                updateComboDisplay();
+            }
+
+            if (matches === gameState.difficulty) {
+                endGame(true);
+            }
+        }
+
+        function updateComboDisplay() {
+            if (gameState.comboMultiplier > 1) {
+                document.getElementById('comboDisplay').textContent = 
+                    `🔥 ${gameState.comboMultiplier.toFixed(1)}x MULTIPLIER`;
+            }
+        }
+
+        function startTimer() {
+            clearInterval(gameState.timerInterval);
+
+            if (gameState.mode === 'time') {
+                gameState.timerInterval = setInterval(() => {
+                    gameState.timeLeft--;
+                    document.getElementById('timerValue').textContent = gameState.timeLeft + 's';
+
+                    if (gameState.timeLeft <= 0) {
+                        endGame(false);
+                    }
+                }, 1000);
+            } else {
+                document.getElementById('timerValue').textContent = Math.max(0, gameState.movesLeft);
+            }
+        }
+
+        function endGame(won) {
+            gameState.gameActive = false;
+            clearInterval(gameState.timerInterval);
+
+            const matches = gameState.circles.reduce((count, color, i) => {
+                return count + (color === gameState.target[i] ? 1 : 0);
+            }, 0);
+
+            const timeTaken = Math.round((Date.now() - gameState.gameStartTime) / 1000);
+            
+            // Calculate score
+            let baseScore = matches * 100;
+            let timeBonus = gameState.mode === 'time' ? Math.max(0, gameState.timeLeft * 10) : 0;
+            let moveBonus = matches === gameState.difficulty ? (30 - gameState.totalMoves) * 25 : 0;
+            let speedBonus = timeTaken < 10 ? 500 : 0;
+            
+            gameState.currentScore = Math.round((baseScore + timeBonus + moveBonus + speedBonus) * gameState.comboMultiplier);
+
+            trackGameEvent('game_end', won ? 'win' : 'loss', matches);
+
+            if (won) {
+                gameState.totalScore += gameState.currentScore;
+                gameState.streak++;
+                
+                // Update level
+                if (gameState.totalScore > 1000 * gameState.level) {
+                    gameState.level++;
+                }
+
+                localStorage.setItem('totalScore', gameState.totalScore.toString());
+                localStorage.setItem('streak', gameState.streak.toString());
+                localStorage.setItem('level', gameState.level.toString());
+
+                // Save to leaderboard
+                const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+                leaderboard.push({ score: gameState.currentScore, date: new Date().toLocaleDateString() });
+                leaderboard.sort((a, b) => b.score - a.score);
+                localStorage.setItem('leaderboard', JSON.stringify(leaderboard.slice(0, 10)));
+            } else {
+                gameState.streak = 0;
+                localStorage.setItem('streak', '0');
+            }
+
+            showResultScreen(won, matches, timeTaken);
+        }
+
+        function showResultScreen(won, matches, timeTaken) {
+            const resultScreen = document.getElementById('resultScreen');
+            const resultIcon = document.getElementById('resultIcon');
+            const resultTitle = document.getElementById('resultTitle');
+            const resultSubtitle = document.getElementById('resultSubtitle');
+            const resultStats = document.getElementById('resultStats');
+            const achievementAlert = document.getElementById('achievementAlert');
+
+            if (won) {
+                resultIcon.textContent = '🎉';
+                resultTitle.textContent = 'YOU WON!';
+                resultSubtitle.textContent = `Amazing! You matched all ${gameState.difficulty} circles!`;
+                createConfetti();
+
+                // Check achievements
+                let newAchievement = null;
+                if (gameState.streak === 1 && !localStorage.getItem('ach_firstWin')) {
+                    newAchievement = '🏅 First Victory - Unlocked!';
+                    localStorage.setItem('ach_firstWin', 'true');
+                }
+                if (gameState.streak === 10 && !localStorage.getItem('ach_tenStreak')) {
+                    newAchievement = '🔥 On Fire! - 10x Win Streak!';
+                    localStorage.setItem('ach_tenStreak', 'true');
+                }
+                if (matches === gameState.difficulty && gameState.totalMoves === 0) {
+                    newAchievement = '💯 Perfect Game - No Mistakes!';
+                }
+                if (timeTaken < 10 && !localStorage.getItem('ach_speedDemon')) {
+                    newAchievement = '⚡ Speed Demon - Under 10 seconds!';
+                    localStorage.setItem('ach_speedDemon', 'true');
+                }
+                if (gameState.difficulty === 8 && !localStorage.getItem('ach_hardMaster')) {
+                    newAchievement = '🎯 Hard Master - Beat Hard Mode!';
+                    localStorage.setItem('ach_hardMaster', 'true');
+                }
+
+                if (newAchievement) {
+                    achievementAlert.innerHTML = `<div class="achievement-unlock"><div class="achievement-text">${newAchievement}</div></div>`;
+                }
+            } else {
+                resultIcon.textContent = '😢';
+                resultTitle.textContent = 'GAME OVER';
+                resultSubtitle.textContent = `You matched ${matches} out of ${gameState.difficulty} circles.`;
+                achievementAlert.innerHTML = '';
+            }
+
+            const statsHTML = `
+                <div class="stat-row">
+                    <span class="stat-label">Correct Matches</span>
+                    <span class="stat-value">${matches} / ${gameState.difficulty}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Game Score</span>
+                    <span class="stat-value">+${gameState.currentScore}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Time Taken</span>
+                    <span class="stat-value">${timeTaken}s</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Total Moves</span>
+                    <span class="stat-value">${gameState.totalMoves}</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Combo Multiplier</span>
+                    <span class="stat-value">${gameState.comboMultiplier.toFixed(1)}x</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Current Streak</span>
+                    <span class="stat-value">🔥 ${gameState.streak}</span>
+                </div>
+            `;
+            resultStats.innerHTML = statsHTML;
+
+            // Update result leaderboard
+            const leaderboard = JSON.parse(localStorage.getItem('leaderboard')) || [];
+            const resultLeaderboardList = document.getElementById('resultLeaderboardList');
+            resultLeaderboardList.innerHTML = leaderboard.slice(0, 5).map((entry, i) => `
+                <div class="leaderboard-entry">
+                    <span class="leaderboard-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}">
+                        #${i + 1}
+                    </span>
+                    <span class="leaderboard-score">${entry.score}</span>
+                </div>
+            `).join('');
+
+            switchScreen('resultScreen');
+            updateStats();
+            updateLeaderboard();
+        }
+
+        function resetGame() {
+            gameState.selectedCircles = [null, null];
+            gameState.totalMoves = 0;
+            gameState.consecutiveMatches = 0;
+            gameState.comboMultiplier = 1;
+            document.getElementById('comboDisplay').textContent = '';
+            startGame();
+        }
+
+        function backToMenu() {
+            clearInterval(gameState.timerInterval);
+            gameState.gameActive = false;
+            switchScreen('menuScreen');
+            updateLeaderboard();
+        }
+
+        function switchScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            document.getElementById(screenId).classList.add('active');
+        }
+
+        function createConfetti() {
+            for (let i = 0; i < 60; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = '-10px';
+                confetti.style.backgroundColor = COLORS[Math.floor(Math.random() * COLORS.length)];
+                confetti.classList.add('active');
+                document.body.appendChild(confetti);
+
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+
+        // Initialize
+        updateStats();
+        updateLeaderboard();
+    </script>
+</body>
+</html>

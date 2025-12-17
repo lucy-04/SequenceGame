@@ -748,6 +748,152 @@
         .leaderboard::-webkit-scrollbar-thumb:hover {
             background: rgba(0, 212, 255, 0.6);
         }
+        /* Simple Instructions Overlay */
+        .instructions-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(5, 7, 16, 0.95);
+            backdrop-filter: blur(5px);
+            z-index: 999;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .instructions-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .overlay-content {
+            background: rgba(10, 14, 39, 0.9);
+            border: 2px solid rgba(0, 212, 255, 0.4);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .overlay-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(135deg, #00d4ff 0%, #a000ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-align: center;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+        }
+
+        .instruction-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 18px;
+            padding: 12px 15px;
+            background: rgba(0, 212, 255, 0.05);
+            border-left: 3px solid rgba(0, 212, 255, 0.5);
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .instruction-item:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-left-color: #00d4ff;
+            transform: translateX(5px);
+        }
+
+        .instruction-item .icon {
+            font-size: 24px;
+            min-width: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .instruction-item p {
+            color: #e2e8f0;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        .instruction-item strong {
+            color: #00d4ff;
+            font-weight: 600;
+        }
+
+        .btn-got-it {
+            width: 100%;
+            padding: 14px;
+            margin-top: 25px;
+            background: linear-gradient(135deg, #00d4ff 0%, #a000ff 100%);
+            color: #0a0e27;
+            border: 2px solid #00d4ff;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: 'Orbitron', sans-serif;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-got-it:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.5);
+        }
+
+        .btn-got-it:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 480px) {
+            .overlay-content {
+                padding: 30px 20px;
+            }
+
+            .overlay-content h2 {
+                font-size: 28px;
+                margin-bottom: 20px;
+            }
+
+            .instruction-item {
+                margin-bottom: 14px;
+                padding: 10px 12px;
+            }
+
+            .instruction-item p {
+                font-size: 13px;
+            }
+
+            .btn-got-it {
+                padding: 12px;
+                font-size: 14px;
+                margin-top: 20px;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
     </style>
 </head>
 <body>
@@ -771,6 +917,39 @@
                 <div class="stat-value" id="totalScoreValue">0</div>
             </div>
         </div>
+        <!-- Simple Instructions Overlay (First Time Only) -->
+<div class="screen instructions-overlay" id="instructionsOverlay">
+    <div class="overlay-content">
+        <h2>How to Play</h2>
+        
+        <div class="instruction-item">
+            <span class="icon">🎯</span>
+            <p><strong>Goal:</strong> Arrange circles to match the hidden pattern</p>
+        </div>
+        
+        <div class="instruction-item">
+            <span class="icon">🔄</span>
+            <p><strong>Play:</strong> Click two circles to swap their positions</p>
+        </div>
+        
+        <div class="instruction-item">
+            <span class="icon">✨</span>
+            <p><strong>Win:</strong> All circles glow green when they match</p>
+        </div>
+        
+        <div class="instruction-item">
+            <span class="icon">⏱️</span>
+            <p><strong>Modes:</strong> Time Challenge or Move-Based Challenge</p>
+        </div>
+        
+        <div class="instruction-item">
+            <span class="icon">🏆</span>
+            <p><strong>Rewards:</strong> Build streaks, unlock achievements, climb leaderboard</p>
+        </div>
+        
+        <button class="btn-got-it" id="gotItBtn">Got It! Let's Play</button>
+    </div>
+</div>
 
         <!-- Menu Screen -->
         <div class="screen menu-screen active" id="menuScreen">
@@ -1235,6 +1414,28 @@
                 setTimeout(() => confetti.remove(), 3000);
             }
         }
+        // Check if first time visitor and show instructions overlay
+function checkFirstTimeVisit() {
+    const firstTimeVisit = localStorage.getItem('circleSequenceFirstVisit');
+    
+    if (!firstTimeVisit) {
+        // First time - show instructions overlay
+        document.getElementById('instructionsOverlay').classList.add('active');
+        // Mark as visited
+        localStorage.setItem('circleSequenceFirstVisit', 'true');
+    }
+}
+
+// Got It button - close overlay and show menu
+document.getElementById('gotItBtn').addEventListener('click', () => {
+    document.getElementById('instructionsOverlay').classList.remove('active');
+    document.getElementById('menuScreen').classList.add('active');
+    trackGameEvent('instructions_closed', 'first_time_visit');
+});
+
+// Call this on page load
+checkFirstTimeVisit();
+
 
         // Initialize
         updateStats();

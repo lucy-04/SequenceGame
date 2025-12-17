@@ -937,7 +937,7 @@
             gameState.target = generateColorArray(gameState.difficulty);
             gameState.timeLeft = 60;
             gameState.totalMoves = 0;
-            gameState.movesLeft = gameState.mode === 'moves' ? 30 : Infinity;
+            gameState.movesLeft = gameState.mode === 'moves' ? 15 : Infinity;
             gameState.gameActive = true;
             gameState.selectedCircles = [null, null];
             gameState.currentScore = 0;
@@ -1000,10 +1000,15 @@
             const [i, j] = gameState.selectedCircles;
             [gameState.circles[i], gameState.circles[j]] = [gameState.circles[j], gameState.circles[i]];
             gameState.totalMoves++;
-            gameState.movesLeft = gameState.mode === 'moves' ? 30 - gameState.totalMoves : Infinity;
+            gameState.movesLeft = gameState.mode === 'moves' ? 15 - gameState.totalMoves : Infinity;
 
             gameState.selectedCircles = [null, null];
             renderCircles();
+
+            // Update moves display
+            if (gameState.mode === 'moves') {
+                document.getElementById('timerValue').textContent = Math.max(0, gameState.movesLeft);
+            }
 
             if (gameState.mode === 'moves' && gameState.movesLeft <= 0) {
                 endGame(false);
@@ -1070,7 +1075,7 @@
             // Calculate score
             let baseScore = matches * 100;
             let timeBonus = gameState.mode === 'time' ? Math.max(0, gameState.timeLeft * 10) : 0;
-            let moveBonus = matches === gameState.difficulty ? (30 - gameState.totalMoves) * 25 : 0;
+            let moveBonus = matches === gameState.difficulty ? (15 - gameState.totalMoves) * 25 : 0;
             let speedBonus = timeTaken < 10 ? 500 : 0;
             
             gameState.currentScore = Math.round((baseScore + timeBonus + moveBonus + speedBonus) * gameState.comboMultiplier);
